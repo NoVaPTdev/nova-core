@@ -1,0 +1,3 @@
+-- NOVA Framework Core - Init
+-- Este ficheiro existe apenas para evitar o aviso "Failed to load script @nova_core/init.lua"
+-- O FiveM tenta carregar init.lua automaticamente de resources listados como dependência

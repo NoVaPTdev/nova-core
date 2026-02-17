@@ -1,0 +1,80 @@
+/* ============================================================
+   NOVA Framework - UI Styles
+   Sistema de Notificações e Progressbar
+   ============================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow: hidden;
+    background: transparent;
+    color: #ffffff;
+}
+
+/* ============================================================
+   PROGRESSBAR
+   ============================================================ */
+
+#progressbar-container {
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9998;
+}
+
+#progressbar-container.hidden {
+    display: none;
+}
+
+.progressbar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 280px;
+}
+
+.progressbar-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+    letter-spacing: 0.3px;
+}
+
+.progressbar-track {
+    width: 100%;
+    height: 5px;
+    background: rgba(12, 14, 18, 0.85);
+    border-radius: 100px;
+    overflow: hidden;
+    border: 1px solid rgba(197, 255, 0, 0.15);
+}
+
+.progressbar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, rgb(150, 195, 46), #C5FF00);
+    border-radius: 100px;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 10px rgba(197, 255, 0, 0.4);
+}
+
+/* ============================================================
+   ANIMAÇÕES
+   ============================================================ */
+
+@keyframes progressShrink {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
+}
