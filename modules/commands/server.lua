@@ -79,6 +79,15 @@ Nova.RegisterModule({
         -- COMANDOS DE ADMINISTRAÇÃO
         -- ============================================================
 
+        --- Comandos que disparam eventos no cliente precisam de um jogador válido (não consola).
+        local function requirePlayer(src, commandName)
+            if not src or src == 0 then
+                print(('[NOVA] O comando /%s deve ser usado em jogo (não na consola do servidor).'):format(commandName or '?'))
+                return false
+            end
+            return true
+        end
+
         Nova.Functions.RegisterCommand('novadmin', 'admin', function(source, args)
             Nova.Functions.Notify(source, 'Painel de administração NOVA', 'info')
         end, {
@@ -545,12 +554,25 @@ Nova.RegisterModule({
             params = { { name = 'id', help = 'ID do jogador (vazio = tu próprio)' } },
         })
 
-        Nova.Functions.RegisterCommand('duty', nil, function(source, args)
+        Nova.Functions.RegisterCommand('servico', nil, function(source, args)
             local player = Nova.Functions.GetPlayer(source)
             if not player then return end
+
+            local medicJob = HospitalConfig and HospitalConfig.MedicJob or 'hospital'
+            if player.gang and player.gang.name == medicJob then
+                Nova.GangDuty = Nova.GangDuty or {}
+                Nova.GangDuty[source] = not Nova.GangDuty[source]
+                local onDuty = Nova.GangDuty[source]
+                Nova.Functions.Notify(source, onDuty and 'Entraste em serviço.' or 'Saíste de serviço.', 'success')
+                TriggerClientEvent('nova:hospital:dutyChanged', source, onDuty)
+                TriggerEvent('nova:server:onDutyChange', source, onDuty)
+                return
+            end
+
             player:ToggleDuty()
+            TriggerClientEvent('nova:hospital:dutyChanged', source, player.job.duty)
         end, {
-            help = 'Entra ou sai de serviço',
+            help = 'Entrar/Sair de serviço',
         })
 
         Nova.Functions.RegisterCommand('me', nil, function(source, args)
@@ -640,13 +662,31 @@ Nova.RegisterModule({
             },
         })
 
+        Nova.Functions.RegisterCommand('car', 'admin', function(source, args)
+            if not requirePlayer(source, 'car') then return end
+            local model = args[1]
+            if not model or model == '' then
+                Nova.Functions.Notify(source, 'Uso: /car [modelo]', 'error')
+                return
+            end
+
+            TriggerClientEvent('nova:client:spawnVehicle', source, model)
+        end, {
+            help = 'Spawna um veículo temporário (sem registar na garagem)',
+            params = {
+                { name = 'modelo', help = 'Nome do modelo do veículo' },
+            },
+        })
+
         Nova.Functions.RegisterCommand('dv', 'admin', function(source, args)
+            if not requirePlayer(source, 'dv') then return end
             TriggerClientEvent('nova:client:deleteVehicle', source)
         end, {
             help = 'Apaga o veículo atual ou mais próximo',
         })
 
         Nova.Functions.RegisterCommand('fix', 'admin', function(source, args)
+            if not requirePlayer(source, 'fix') then return end
             TriggerClientEvent('nova:client:fixVehicle', source)
         end, {
             help = 'Repara o veículo atual',
@@ -657,12 +697,14 @@ Nova.RegisterModule({
         -- ============================================================
 
         Nova.Functions.RegisterCommand('tpm', 'admin', function(source, args)
+            if not requirePlayer(source, 'tpm') then return end
             TriggerClientEvent('nova:client:teleportMarker', source)
         end, {
             help = 'Teleporta para o marcador no mapa',
         })
 
         Nova.Functions.RegisterCommand('tpcoords', 'admin', function(source, args)
+            if not requirePlayer(source, 'tpcoords') then return end
             local x = tonumber(args[1])
             local y = tonumber(args[2])
             local z = tonumber(args[3])
@@ -686,6 +728,7 @@ Nova.RegisterModule({
         -- ============================================================
 
         Nova.Functions.RegisterCommand('nc', 'admin', function(source, args)
+            if not requirePlayer(source, 'nc') then return end
             TriggerClientEvent('nova:client:toggleNoclip', source)
         end, {
             help = 'Ativa/desativa noclip',
@@ -693,6 +736,14 @@ Nova.RegisterModule({
 
         Nova.Functions.RegisterCommand('god', 'admin', function(source, args)
             local target = Nova.Functions.ResolveTargetId(args[1], source)
+            if not target or target == 0 then
+                if source == 0 then
+                    print('[NOVA] O comando /god deve ser usado em jogo ou com um ID: /god [id]')
+                else
+                    Nova.Functions.Notify(source, 'Jogador não encontrado.', 'error')
+                end
+                return
+            end
             TriggerClientEvent('nova:client:toggleGodmode', target)
 
             -- Limpar is_dead no server
@@ -722,18 +773,21 @@ Nova.RegisterModule({
         })
 
         Nova.Functions.RegisterCommand('invisible', 'admin', function(source, args)
+            if not requirePlayer(source, 'invisible') then return end
             TriggerClientEvent('nova:client:toggleInvisible', source)
         end, {
             help = 'Ativa/desativa invisibilidade',
         })
 
         Nova.Functions.RegisterCommand('tpcds', 'admin', function(source, args)
+            if not requirePlayer(source, 'tpcds') then return end
             TriggerClientEvent('nova:client:tpCoordsInput', source)
         end, {
             help = 'Teleportar para coordenadas (abre painel)',
         })
 
         Nova.Functions.RegisterCommand('coords', nil, function(source, args)
+            if not requirePlayer(source, 'coords') then return end
             local ped = GetPlayerPed(source)
             local coords = GetEntityCoords(ped)
             local heading = GetEntityHeading(ped)

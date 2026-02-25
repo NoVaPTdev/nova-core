@@ -26,6 +26,8 @@ shared_scripts {
     'config/groups/salary.lua',
     'config/groups/locations.lua',
     'config/items.lua',
+    'config/blips.lua',
+    'config/hospital.lua',
     'shared/locale.lua',
     'config/locales/pt.lua',
     'config/locales/en.lua',
@@ -47,16 +49,19 @@ server_scripts {
     'modules/commands/server.lua',
     'modules/jobs/server.lua',
     'modules/vehiclekeys/server.lua',
+    'server/hospital.lua',
 }
 
 client_scripts {
     'client/callbacks.lua',
     'client/functions.lua',
     'client/main.lua',
+    'client/blips.lua',
     'client/ipl.lua',
     'client/world.lua',
     'client/weather.lua',
     'modules/vehiclekeys/client.lua',
+    'client/hospital.lua',
 }
 
 ui_page 'ui/index.html'

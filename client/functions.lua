@@ -552,7 +552,7 @@ RegisterNetEvent('nova:client:toggleGodmode', function()
         local ok, dead = pcall(exports['nova_deathscreen'].IsDead, exports['nova_deathscreen'])
         if ok and dead then
             TriggerEvent('nova:death:forceRespawn')
-            Wait(200)
+            Wait(300)
             ped = PlayerPedId()
         end
     end
@@ -561,9 +561,18 @@ RegisterNetEvent('nova:client:toggleGodmode', function()
     if IsEntityDead(ped) then
         local coords = GetEntityCoords(ped)
         NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, GetEntityHeading(ped), true, false)
-        Wait(100)
+        Wait(200)
         ped = PlayerPedId()
     end
+
+    -- Garantir que o jogador tem controlo total
+    FreezeEntityPosition(ped, false)
+    SetEntityInvincible(ped, false)
+    SetPlayerInvincible(PlayerId(), false)
+    SetPlayerControl(PlayerId(), true, 0)
+    ClearPedTasksImmediately(ped)
+    ClearPedTasks(ped)
+    SetPedCanRagdoll(ped, true)
 
     -- Aplicar cura completa
     SetEntityHealth(ped, GetEntityMaxHealth(ped))
